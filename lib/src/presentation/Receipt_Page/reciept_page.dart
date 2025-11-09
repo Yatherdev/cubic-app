@@ -1,15 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import '../../core/utils/pdf_generator.dart';
-import '../../data/hive/hive_services.dart';
 import '../../domain/models/client.dart';
 import '../../domain/models/invoice.dart';
-import '../../domain/models/invoice_item.dart';
 import '../providers/providers.dart';
 
 

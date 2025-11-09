@@ -35,7 +35,7 @@ dev_dependencies:
   hive_generator: ^2.0.1
   build_runner: ^2.4.11
   flutter_lints: ^5.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
@@ -43,8 +43,6 @@ flutter:
   assets:
     - assets/images/
     - assets/animation/
-    - assets/images/cubelogo.png
-    - assets/images/logopic.png
 
   fonts:
     - family: Cairo-Black
@@ -73,7 +71,7 @@ flutter:
         - asset: assets/fonts/Cairo-SemiBold.ttf
 
 flutter_native_splash:
-  color: "#ffffff"                  # لون الخلفية
+  color: "0xFF305700"                  # لون الخلفية
   image: assets/images/logopic.png     # لوجو التطبيق
   android_gravity: center
   ios_content_mode: center
@@ -83,7 +81,7 @@ flutter_native_splash:
     image: assets/images/logopic.png
     color: "#305700"
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/images/cubelogo.png"   # أيقونة التطبيق

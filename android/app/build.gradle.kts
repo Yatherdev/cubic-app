@@ -1,7 +1,11 @@
 plugins {
+    // مكون Android الأساسي
     id("com.android.application")
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+
+    // مكون Kotlin الصحيح باسم الجديد
+    id("org.jetbrains.kotlin.android")
+
+    // لازم ييجي بعد Android و Kotlin
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -20,21 +24,23 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // Application ID (اسم الحزمة)
         applicationId = "com.example.calc_wood"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+
+        // إعدادات الـ SDKs
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
+
+        // معلومات الإصدار
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // حالياً بنستخدم debug signing علشان الاختبار
             signingConfig = signingConfigs.getByName("debug")
+            // لو هتجهز لتوقيع التطبيق لاحقاً، غيرها هنا
         }
     }
 }

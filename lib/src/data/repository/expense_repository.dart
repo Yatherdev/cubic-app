@@ -4,9 +4,17 @@ import '../../domain/models/expense.dart';
 import '../hive/hive_services.dart';
 
 class ExpenseRepository {
-  final box = Hive.box<Expense>(HiveService.expensesBox);
+  Box<Expense> get box => Hive.box<Expense>(HiveService.expensesBox);
+
   List<Expense> getAll() => box.values.toList();
-  Future<void> add(Expense expense) => box.add(expense);
-  Future<void> update(Expense expense) => expense.save();
-  Future<void> delete(Expense expense) => expense.delete();
+
+  Future<void> add(Expense expense) async => await box.add(expense);
+
+  Future<void> update(Expense expense) async {
+    if (expense.key != null) await box.put(expense.key, expense);
+  }
+
+  Future<void> delete(Expense expense) async {
+    if (expense.key != null) await box.delete(expense.key);
+  }
 }

@@ -1,6 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../data/hive/hive_services.dart';
+import '../../data/repository/client_repository.dart';
+import '../../data/repository/counter_repository.dart';
+import '../../data/repository/expense_repository.dart';
+import '../../data/repository/invoice_repository.dart';
+import '../../data/repository/product_repository.dart';
 import '../../data/repository/purchase_repository.dart';
 import '../../domain/models/cachbox.dart';
 import '../../domain/models/product_item.dart';
@@ -11,99 +16,26 @@ import '../../domain/models/expense.dart';
 import '../../domain/models/purchase.dart';
 import 'package:uuid/uuid.dart';
 
-class ProductRepository {
-  Box<ProductItem> get box => Hive.box<ProductItem>(HiveService.productsBox);
-
-  List<ProductItem> getAll() => box.values.toList();
-
-  Future<void> add(ProductItem item) async {
-    await box.add(item);
-  }
-
-  Future<void> update(ProductItem item) async {
-    if (item.key != null) {
-      await box.put(item.key, item);
-    } else {
-      await box.add(item);
-    }
-  }
-
-  Future<void> delete(ProductItem item) async {
-    if (item.key != null) await box.delete(item.key);
-  }
-}
-
-class ClientRepository {
-  Box<Client> get box => Hive.box<Client>(HiveService.clientsBox);
-
-  List<Client> getAll() => box.values.toList();
-
-  Future<void> add(Client client) async => await box.add(client);
-
-  Future<void> update(Client client) async {
-    if (client.key != null) await box.put(client.key, client);
-  }
-
-  Future<void> delete(Client client) async {
-    if (client.key != null) await box.delete(client.key);
-  }
-}
-
-class InvoiceRepository {
-  Box<Invoice> get box => Hive.box<Invoice>(HiveService.invoicesBox);
-
-  List<Invoice> getAll() => box.values.toList();
-
-  Future<void> add(Invoice invoice) async => await box.add(invoice);
-
-  Future<void> update(Invoice invoice) async {
-    if (invoice.key != null) await box.put(invoice.key, invoice);
-  }
-
-  Future<void> delete(Invoice invoice) async {
-    if (invoice.key != null) await box.delete(invoice.key);
-  }
-}
-
-class ExpenseRepository {
-  Box<Expense> get box => Hive.box<Expense>(HiveService.expensesBox);
-
-  List<Expense> getAll() => box.values.toList();
-
-  Future<void> add(Expense expense) async => await box.add(expense);
-
-  Future<void> update(Expense expense) async {
-    if (expense.key != null) await box.put(expense.key, expense);
-  }
-
-  Future<void> delete(Expense expense) async {
-    if (expense.key != null) await box.delete(expense.key);
-  }
-}
-
-class CountersRepository {
-  Box<int> get box => Hive.box<int>(HiveService.countersBox);
-
-  int nextInvoiceNumber() {
-    final current = box.get('invoiceNumber', defaultValue: 0) ?? 0;
-    box.put('invoiceNumber', current + 1);
-    return current + 1;
-  }
-}
-
 final productRepoProvider = Provider((ref) => ProductRepository());
+
 final clientRepoProvider = Provider((ref) => ClientRepository());
+
 final invoiceRepoProvider = Provider((ref) => InvoiceRepository());
+
 final expenseRepoProvider = Provider((ref) => ExpenseRepository());
+
 final countersRepoProvider = Provider((ref) => CountersRepository());
+
 final purchaseRepoProvider = Provider((ref) => PurchaseRepository());
 
-final productsProvider = StateNotifierProvider<ProductsController, List<ProductItem>>((ref) {
-  return ProductsController(ref.read(productRepoProvider));
-});
+final productsProvider =
+    StateNotifierProvider<ProductsController, List<ProductItem>>((ref) {
+      return ProductsController(ref.read(productRepoProvider));
+    });
 
 class ProductsController extends StateNotifier<List<ProductItem>> {
   final ProductRepository repo;
+
   ProductsController(this.repo) : super([]) {
     load();
   }
@@ -123,7 +55,9 @@ class ProductsController extends StateNotifier<List<ProductItem>> {
       load(); // تحديث الحالة بعد الإضافة
     } catch (e) {
       print('Error adding product: $e');
-      throw Exception('Failed to add product: $e'); // رمي استثناء لمعالجة الأخطاء
+      throw Exception(
+        'Failed to add product: $e',
+      ); // رمي استثناء لمعالجة الأخطاء
     }
   }
 
@@ -148,12 +82,15 @@ class ProductsController extends StateNotifier<List<ProductItem>> {
   }
 }
 
-final clientsProvider = StateNotifierProvider<ClientsController, List<Client>>((ref) {
+final clientsProvider = StateNotifierProvider<ClientsController, List<Client>>((
+  ref,
+) {
   return ClientsController(ref.read(clientRepoProvider));
 });
 
 class ClientsController extends StateNotifier<List<Client>> {
   final ClientRepository repo;
+
   ClientsController(this.repo) : super([]) {
     load();
   }
@@ -188,17 +125,24 @@ class ClientsController extends StateNotifier<List<Client>> {
   }
 
   List<Client> search(String query) {
-    return state.where((c) => c.name.contains(query) || c.phone.contains(query)).toList();
+    return state
+        .where((c) => c.name.contains(query) || c.phone.contains(query))
+        .toList();
   }
 }
 
-final invoicesProvider = StateNotifierProvider<InvoicesController, List<Invoice>>((ref) {
-  return InvoicesController(ref.read(invoiceRepoProvider), ref.read(countersRepoProvider));
-});
+final invoicesProvider =
+    StateNotifierProvider<InvoicesController, List<Invoice>>((ref) {
+      return InvoicesController(
+        ref.read(invoiceRepoProvider),
+        ref.read(countersRepoProvider),
+      );
+    });
 
 class InvoicesController extends StateNotifier<List<Invoice>> {
   final InvoiceRepository repo;
   final CountersRepository counters;
+
   InvoicesController(this.repo, this.counters) : super([]) {
     load();
   }
@@ -252,12 +196,14 @@ class InvoicesController extends StateNotifier<List<Invoice>> {
   }
 }
 
-final expensesProvider = StateNotifierProvider<ExpensesController, List<Expense>>((ref) {
-  return ExpensesController(ref.read(expenseRepoProvider));
-});
+final expensesProvider =
+    StateNotifierProvider<ExpensesController, List<Expense>>((ref) {
+      return ExpensesController(ref.read(expenseRepoProvider));
+    });
 
 class ExpensesController extends StateNotifier<List<Expense>> {
   final ExpenseRepository repo;
+
   ExpensesController(this.repo) : super([]) {
     load();
   }
@@ -282,7 +228,9 @@ class ExpensesController extends StateNotifier<List<Expense>> {
   }
 }
 
-final cashboxProvider = StateNotifierProvider<CashboxController, Cashbox>((ref) {
+final cashboxProvider = StateNotifierProvider<CashboxController, Cashbox>((
+  ref,
+) {
   return CashboxController();
 });
 
@@ -319,12 +267,14 @@ class CashboxController extends StateNotifier<Cashbox> {
   }
 }
 
-final purchasesProvider = StateNotifierProvider<PurchasesController, List<Purchase>>((ref) {
-  return PurchasesController(ref.read(purchaseRepoProvider));
-});
+final purchasesProvider =
+    StateNotifierProvider<PurchasesController, List<Purchase>>((ref) {
+      return PurchasesController(ref.read(purchaseRepoProvider));
+    });
 
 class PurchasesController extends StateNotifier<List<Purchase>> {
   final PurchaseRepository repo;
+
   PurchasesController(this.repo) : super([]) {
     load();
   }
@@ -368,4 +318,3 @@ class PurchasesController extends StateNotifier<List<Purchase>> {
     }
   }
 }
-

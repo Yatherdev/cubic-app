@@ -3,9 +3,23 @@ import '../../domain/models/product_item.dart';
 import '../hive/hive_services.dart';
 
 class ProductRepository {
-  final box = Hive.box<ProductItem>(HiveService.productsBox);
+  Box<ProductItem> get box => Hive.box<ProductItem>(HiveService.productsBox);
+
   List<ProductItem> getAll() => box.values.toList();
-  Future<void> add(ProductItem item) => box.add(item);
-  Future<void> update(ProductItem item) => item.save();
-  Future<void> delete(ProductItem item) => item.delete();
+
+  Future<void> add(ProductItem item) async {
+    await box.add(item);
+  }
+
+  Future<void> update(ProductItem item) async {
+    if (item.key != null) {
+      await box.put(item.key, item);
+    } else {
+      await box.add(item);
+    }
+  }
+
+  Future<void> delete(ProductItem item) async {
+    if (item.key != null) await box.delete(item.key);
+  }
 }
